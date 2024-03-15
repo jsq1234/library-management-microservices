@@ -18,10 +18,7 @@ export class SignupComponent {
       [Validators.required, passwordValidator(), Validators.minLength(8)],
     ],
     name: ['', [Validators.required]],
-    phoneNo: [
-      '',
-      [Validators.required, Validators.minLength(10), Validators.maxLength(10)],
-    ],
+    phoneNo: ['', [Validators.required]],
   });
 
   private isBadCredentials = false;

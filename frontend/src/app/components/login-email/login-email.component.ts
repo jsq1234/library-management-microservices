@@ -14,6 +14,7 @@ export class LoginEmailComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
+
   private isBadCredentials = false;
   constructor(
     private formBuilder: FormBuilder,
@@ -43,15 +44,26 @@ export class LoginEmailComponent {
       .subscribe({
         next: (value) => {
           this.isBadCredentials = false;
+
+          const { accessToken, idToken, refreshToken } =
+            value.authenticationResults;
+          const { userId, email, phoneNumber, role } = value;
           this.authService.authToken = {
-            ...value.authenticationResults,
+            accessToken,
+            idToken,
+            refreshToken,
           };
+
           this.authService.user = {
-            ...value,
+            userId,
+            email,
+            phoneNumber,
+            role,
             name: 'random',
           };
 
           localStorage.setItem('user', JSON.stringify(this.authService.user));
+
           localStorage.setItem(
             'auth_tokens',
             JSON.stringify(this.authService.authToken)

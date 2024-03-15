@@ -4,7 +4,7 @@ import { AuthService } from '../services/auth.service';
 
 export const userGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
-  if (authService.user) {
+  if (authService.authToken) {
     const router = inject(Router);
     router.navigate(['home']);
     return false;

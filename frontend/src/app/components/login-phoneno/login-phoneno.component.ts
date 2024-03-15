@@ -47,8 +47,20 @@ export class LoginPhonenoComponent {
       .subscribe({
         next: (value) => {
           this.isBadCredentials = false;
-          this.authService.user = value;
-          localStorage.setItem('user', JSON.stringify(value));
+          this.authService.authToken = {
+            ...value.authenticationResults,
+          };
+          this.authService.user = {
+            ...value,
+            name: 'random',
+          };
+
+          localStorage.setItem('user', JSON.stringify(this.authService.user));
+          localStorage.setItem(
+            'auth_tokens',
+            JSON.stringify(this.authService.authToken)
+          );
+          
           this.router.navigate(['/home']);
         },
         error: (err) => {

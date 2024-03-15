@@ -5,6 +5,7 @@ import { HomeComponent } from './components/home/home.component';
 import { userGuard } from './guards/user.guard';
 import { authGuard } from './guards/auth.guard';
 import { LoginContainerComponent } from './components/login-container/login-container.component';
+import { ConfirmationCodeComponent } from './components/confirmation-code/confirmation-code.component';
 import { LoginEmailComponent } from './components/login-email/login-email.component';
 import { LoginPhonenoComponent } from './components/login-phoneno/login-phoneno.component';
 import { BooksComponent } from './components/home/books/books.component';
@@ -30,6 +31,11 @@ const routes: Routes = [
     path: 'signup',
     component: SignupComponent,
     canActivate: [userGuard],
+  },
+  {
+    path: 'confirm/:userId',
+    component: ConfirmationCodeComponent,
+    canActivate: [userGuard]
   },
   {
     path: 'home',
