@@ -17,6 +17,7 @@ import com.amazonaws.services.cognitoidp.model.InitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.SignUpResult;
 import com.demo.userservice.dto.ChangePassword;
 import com.demo.userservice.dto.ConfirmEmailRequest;
+import com.demo.userservice.dto.ForgotPasswordRequest;
 import com.demo.userservice.dto.SignInRequest;
 import com.demo.userservice.dto.SignInResponse;
 import com.demo.userservice.dto.SignUpRequest;
@@ -47,9 +48,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot_password_request")
-    public ResponseEntity<ForgotPasswordResult> forgotPassword(@RequestBody String email){
+    public ResponseEntity<ForgotPasswordResult> forgotPassword(@RequestBody ForgotPasswordRequest forgotPasswordRequest){
         ForgotPasswordResult result = userService
-                                        .forgotPassword(email);
+                                        .forgotPassword(forgotPasswordRequest.email());
         return ResponseEntity.status(200).body(result);
     }
 

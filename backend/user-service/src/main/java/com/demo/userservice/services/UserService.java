@@ -161,7 +161,8 @@ public class UserService {
                                         cognitoConfig.getClientId(), 
                                         cognitoConfig.getClientSecret(),
                                         email);
-                                        
+        log.info("Sending password change request to {}", email);
+                            
         ForgotPasswordRequest request = new ForgotPasswordRequest()
                                                 .withClientId(cognitoConfig.getClientId())
                                                 .withUsername(email)
