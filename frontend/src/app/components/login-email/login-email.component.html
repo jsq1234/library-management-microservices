@@ -32,6 +32,7 @@
           >
             <div *ngIf="password.errors?.['required']">Password is required.</div>
           </small>
+          <div class="goto-register"><a routerLink="/forgot_password">forgot password?</a></div>
         </div>
         <small *ngIf="badCredentials" class="s-error">
             <div *ngIf="badCredentials">email or password incorrect.</div>

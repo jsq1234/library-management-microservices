@@ -1,0 +1,13 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Three columns with equal width */
+    gap: 20px; /* Gap between grid items */
+  }
+  
+.grid li {
+  /* Styles for individual grid items (books) */
+  list-style-type: none; /* Remove bullet points */
+  border: 2px solid #899ce0; /* Example border */
+  padding: 10px;
+  width: 100%;
+}

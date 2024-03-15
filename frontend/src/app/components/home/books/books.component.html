@@ -1,1 +1,14 @@
-<p>books works!</p>
+<div style="width: 100%;">
+    <h2>Books</h2>
+    <ul class="grid">
+      <li *ngFor="let book of books">
+        <h3>{{ book.title }}</h3>
+        <p>Author: {{ book.author }}</p>
+        <p>Genre: {{ book.genre }}</p>
+        <p>Published: {{ book.publishDate | date }}</p>
+        <p>Price: {{ book.price | currency }}</p>
+        <p>Quantity: {{ book.quantity }}</p>
+        <p>ISBN: {{ book.isbn }}</p>
+      </li>
+    </ul>
+</div>

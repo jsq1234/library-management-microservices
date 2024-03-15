@@ -10,6 +10,7 @@ import { LoginEmailComponent } from './components/login-email/login-email.compon
 import { LoginPhonenoComponent } from './components/login-phoneno/login-phoneno.component';
 import { BooksComponent } from './components/home/books/books.component';
 import { IssuesComponent } from './components/home/issues/issues.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 const routes: Routes = [
   {
@@ -28,6 +29,11 @@ const routes: Routes = [
     canActivate: [userGuard],
   },
   {
+    path: 'forgot_password',
+    component: ForgotPasswordComponent,
+    canActivate: [userGuard],
+  },
+  {
     path: 'signup',
     component: SignupComponent,
     canActivate: [userGuard],
@@ -35,7 +41,7 @@ const routes: Routes = [
   {
     path: 'confirm/:userId',
     component: ConfirmationCodeComponent,
-    canActivate: [userGuard]
+    canActivate: [userGuard],
   },
   {
     path: 'home',

@@ -10,6 +10,7 @@ import { SignInResponse } from '../interfaces/signin-response';
 import { User } from '../interfaces/user';
 import { AuthToken } from '../interfaces/auth-token';
 import { SignUpResponse } from '../interfaces/signup-response';
+import { ChangePassword } from '../interfaces/change-password';
 
 @Injectable({
   providedIn: 'root',
@@ -48,9 +49,24 @@ export class AuthService {
     );
   }
 
+  public sendChangePasswordRequest(email: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/forgot_password_request`, {
+      email,
+    });
+  }
+
+  public changePassword(requestBody: ChangePassword): Observable<any> {
+    return this.http.post<any>(
+      `${this.baseUrl}/confirm_forgot_password`,
+      requestBody
+    );
+  }
+
   public logout() {
     this.authenticatedUser = null;
+    this.authToken = null;
     localStorage.removeItem('user');
+    localStorage.removeItem('auth_tokens');
     this.router.navigate(['login']);
   }
 
