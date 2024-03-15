@@ -23,6 +23,12 @@ public class GatewayConfig {
                 .route("user-confirm-route",
                         r -> r.path("/auth/confirm")
                                 .uri("http://user-service:8081/"))
+                .route("user-change-password-request",
+                        r -> r.path("/auth/forgot_password_request")
+                                .uri("http://user-service:8081/"))
+                .route("user-confirm-password-request",
+                         r -> r.path("/auth/confirm_forgot_password")
+                                .uri("http://user-service:8081/"))
                 .route("generic-user-routes",
                         r -> r.path("/user/**")
                                 .filters(f -> f.filter(jwtAuthenticationFilter))

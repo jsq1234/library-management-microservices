@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
+import com.amazonaws.services.cognitoidp.model.ConfirmForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.ConfirmSignUpResult;
+import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.GetUserResult;
 import com.amazonaws.services.cognitoidp.model.InitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.SignUpResult;
+import com.demo.userservice.dto.ChangePassword;
 import com.demo.userservice.dto.ConfirmEmailRequest;
 import com.demo.userservice.dto.SignInRequest;
 import com.demo.userservice.dto.SignInResponse;
@@ -35,12 +38,28 @@ public class AuthController {
         return ResponseEntity.status(201).body(result);
     }
 
-    @PostMapping("/confirm")
+    @PostMapping("/confirm_account")
     public ResponseEntity<ConfirmSignUpResult> confirmUser(@Valid @RequestBody ConfirmEmailRequest confirmRequest){
         ConfirmSignUpResult result = userService
                                         .confirmVerificationCode(confirmRequest.userId(), confirmRequest.code());
                                         
         return ResponseEntity.status(200).body(result);
+    }
+
+    @PostMapping("/forgot_password_request")
+    public ResponseEntity<ForgotPasswordResult> forgotPassword(@RequestBody String email){
+        ForgotPasswordResult result = userService
+                                        .forgotPassword(email);
+        return ResponseEntity.status(200).body(result);
+    }
+
+    @PostMapping("/confirm_forgot_password")
+    public ResponseEntity<ConfirmForgotPasswordResult> confirmForgotPassword(@Valid @RequestBody ChangePassword changePasswordRequest){
+        ConfirmForgotPasswordResult result = userService.confirmForgotPassword(
+                                                        changePasswordRequest.email(), 
+                                                        changePasswordRequest.password(), 
+                                                        changePasswordRequest.code());
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/signin")

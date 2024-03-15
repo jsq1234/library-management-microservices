@@ -10,8 +10,12 @@ import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
+import com.amazonaws.services.cognitoidp.model.ConfirmForgotPasswordRequest;
+import com.amazonaws.services.cognitoidp.model.ConfirmForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.ConfirmSignUpRequest;
 import com.amazonaws.services.cognitoidp.model.ConfirmSignUpResult;
+import com.amazonaws.services.cognitoidp.model.ForgotPasswordRequest;
+import com.amazonaws.services.cognitoidp.model.ForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.GetUserRequest;
 import com.amazonaws.services.cognitoidp.model.GetUserResult;
 import com.amazonaws.services.cognitoidp.model.InitiateAuthRequest;
@@ -60,6 +64,7 @@ public class UserService {
                                             .withValue("user")
                                     }
                                 );
+        
         SignUpResult signUpResult = cognitoIdentityProvider.signUp(signUpRequest);
         
         log.info("User succesfully created : {}", signUpResult);
@@ -151,6 +156,44 @@ public class UserService {
         return result;
     }
 
+    public ForgotPasswordResult forgotPassword(String email){
+        String secretHash = SecretHashUtil.calculateSecretHash(
+                                        cognitoConfig.getClientId(), 
+                                        cognitoConfig.getClientSecret(),
+                                        email);
+                                        
+        ForgotPasswordRequest request = new ForgotPasswordRequest()
+                                                .withClientId(cognitoConfig.getClientId())
+                                                .withUsername(email)
+                                                .withSecretHash(secretHash);
+
+        ForgotPasswordResult result = cognitoIdentityProvider.forgotPassword(request);
+
+        log.info("{}", result);
+
+        return result;
+
+    }
+
+    public ConfirmForgotPasswordResult confirmForgotPassword(String email, String password, String code){
+        String secretHash = SecretHashUtil.calculateSecretHash(
+                                        cognitoConfig.getClientId(), 
+                                        cognitoConfig.getClientSecret(),
+                                        email);
+
+        ConfirmForgotPasswordRequest request = new ConfirmForgotPasswordRequest()
+                                                        .withClientId(cognitoConfig.getClientId())
+                                                        .withConfirmationCode(code)
+                                                        .withUsername(email)
+                                                        .withSecretHash(secretHash)
+                                                        .withPassword(password);
+        
+        ConfirmForgotPasswordResult result = cognitoIdentityProvider.confirmForgotPassword(request);
+
+        log.info("{}", result);
+
+        return result;
+    }
     public AdminInitiateAuthResult renewTokens(String refreshToken, String userId) {
         String secretHash = SecretHashUtil.calculateSecretHash(
                                         cognitoConfig.getClientId(), 
