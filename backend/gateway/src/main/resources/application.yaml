@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway
+
+cognito:
+  pool_id: ${PoolId}
+  client_id: ${ClientId}
+  client_secret: ${ClientSecret}
+  region: ${Region}
+
+aws:
+  access_key: ${AccessKey}
+  secret_access_key: ${SecretAccessKey}
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: DEBUG
+        web:
+          HttpLogging: DEBUG
+    reactor:
+      netty:
+        http:
+          server:
+            HttpServerHandler: DEBUG
+          client: DEBUG

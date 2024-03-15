@@ -1,0 +1,44 @@
+<div class="form-container">
+    <h1>LOGIN</h1>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+            <label for="email">Email</label>
+            <input 
+            [class.error] = "(email.invalid && (email.dirty || email.touched)) || badCredentials"
+            type="email" 
+            placeholder="test@example.com" 
+            name="email" 
+            formControlName="email"
+            required />
+            <small
+                *ngIf="email.invalid && (email.dirty || email.touched)"
+                class="s-error"
+                    >
+                <div *ngIf="email.errors?.['required']">Email is required.</div>
+                <div *ngIf="email.errors?.['email']">Email should be valid</div>
+            </small>
+        </div>
+        <div class="form-field">
+            <label for="password">Password</label>
+            <input 
+            [class.error] = "(password.invalid && (password.dirty || password.touched)) || badCredentials"
+            type="password" 
+            name="password" 
+            formControlName="password"
+            required />
+            <small
+            *ngIf="password.invalid && (password.dirty || password.touched)"
+            class="s-error"
+          >
+            <div *ngIf="password.errors?.['required']">Password is required.</div>
+          </small>
+        </div>
+        <small *ngIf="badCredentials" class="s-error">
+            <div *ngIf="badCredentials">email or password incorrect.</div>
+        </small>
+        <button class="submit-button" [disabled]="loginForm.invalid" type="submit">
+            Login
+        </button>
+        <div class="goto-register">Not a member? <a routerLink="/signup">Register</a></div>
+    </form>
+</div>

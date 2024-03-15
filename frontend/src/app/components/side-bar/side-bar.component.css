@@ -1,0 +1,42 @@
+aside{
+    max-width: 16rem;
+    border-right: 3px solid rgba(61, 171, 255, 0.457);
+    height: 100vh;
+    margin-top: 0;
+    padding: 1.25rem 0.75rem;
+    box-shadow: 0.5px 0 8px 2px rgba(36, 149, 236, 0.418);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+h3{
+    margin: 0px;
+    font-weight: 700;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    color: rgb(1, 54, 151);
+}
+ul{
+    list-style-type: none;
+    padding: 0px;
+    height: 100%;
+    margin-top: 4rem;
+}
+
+ul>li{
+    margin-top: 0.85rem;
+    padding: 5px 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease; 
+}
+
+ul>li:hover{
+    background-color:  #0861ba;
+    color: aliceblue;
+}
+
+.active{
+    background-color:  #0861ba;
+    color: aliceblue;
+}

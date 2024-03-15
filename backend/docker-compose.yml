@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  gateway:
+    image: gateway-image
+    container_name: gateway
+    expose:
+      - 8080
+    env_file:
+      - ./.env.cognito
+    ports:
+      - 8080:8080
+
+  user-service:
+    image: user-service-image
+    container_name: user-service
+    expose:
+      - 8081
+    env_file:
+      - ./.env.cognito
+
+  book-service:
+    image: book-service-image
+    container_name: book-service
+    expose:
+      - 8082
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://book-database:3306/library
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=1234
+     
+    depends_on:
+      - book-database
+
+
+  book-database:
+    image: mysql:latest
+    container_name: book-database
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=library
