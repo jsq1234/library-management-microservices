@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.amazonaws.services.cognitoidp.model.CodeMismatchException;
+import com.amazonaws.services.cognitoidp.model.NotAuthorizedException;
 import com.amazonaws.services.cognitoidp.model.UserNotFoundException;
 import com.demo.userservice.dto.HttpError;
 import lombok.extern.slf4j.Slf4j;
@@ -21,5 +22,11 @@ public class UserServiceExceptionHandler {
     public ResponseEntity<HttpError> handleUserNotFoundException(UserNotFoundException ex){
         log.info("{}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new HttpError(HttpStatus.UNAUTHORIZED, "User not found."));
+    }
+
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<HttpError> handleNotAuthorized(NotAuthorizedException ex){
+        log.info("{}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new HttpError(HttpStatus.UNAUTHORIZED, ex.getMessage()));
     }
 }
