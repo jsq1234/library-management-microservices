@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   public confirmAccount(requestBody: ConfirmRequest): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/confirm`, requestBody);
+    return this.http.post<void>(`${this.baseUrl}/confirm_account`, requestBody);
   }
 
   public signUp(requestBody: SignUpRequest): Observable<SignUpResponse> {
