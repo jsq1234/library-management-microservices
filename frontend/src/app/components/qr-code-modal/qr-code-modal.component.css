@@ -1,0 +1,67 @@
+.qr-modal{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 2px solid black; /* Ensure the modal doesn't exceed the viewport width */
+    padding: 2rem 4rem;
+    border-radius: 8px;
+    background-color: rgb(234, 232, 251); /* Optionally, add background color */
+    z-index: 9999; /* Adjust z-index as needed */
+}
+
+.qrcode{
+    height: 400px;
+    width: 400px;
+}
+
+h4{
+    margin: 0;
+}
+
+form {
+    display: flex;
+    justify-content: space-around;
+    height: 100%;
+}
+
+.form-field {
+    width: 80%;
+    display: flex;
+    margin-bottom: 1rem;
+    gap: 8px;
+    align-items: center;
+}
+
+.form-field input{
+    width: 100%;
+}
+
+input{
+    padding: 2px 8px;
+    border: 2px solid #5885ee;
+    border-radius: 6px;
+    transition: border-color 0.2s;
+}
+
+input:focus{
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 1px 3px rgb(69, 149, 235);
+}
+
+.submit-button {
+    padding: 4px 12px;
+    background-color: #007bff;
+    font-weight: 500;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0,0,0,.15);
+    transition: all .3s ease;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}

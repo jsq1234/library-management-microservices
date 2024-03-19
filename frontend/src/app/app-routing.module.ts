@@ -11,6 +11,7 @@ import { LoginPhonenoComponent } from './components/login-phoneno/login-phoneno.
 import { BooksComponent } from './components/home/books/books.component';
 import { IssuesComponent } from './components/home/issues/issues.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { TotpCodeVerificationComponent } from './components/totp-code-verification/totp-code-verification.component';
 
 const routes: Routes = [
   {
@@ -41,6 +42,11 @@ const routes: Routes = [
   {
     path: 'confirm/:userId',
     component: ConfirmationCodeComponent,
+    canActivate: [userGuard],
+  },
+  {
+    path: 'verify_totp_code',
+    component: TotpCodeVerificationComponent,
     canActivate: [userGuard],
   },
   {

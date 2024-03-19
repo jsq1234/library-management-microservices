@@ -43,3 +43,5 @@
         <div class="goto-register">Not a member? <a routerLink="/signup">Register</a></div>
     </form>
 </div>
+
+<app-qr-code-modal [showModal]="isModalVisible" [qrCodeUrl]="qrCodeUrl" [accessToken]="accessToken"></app-qr-code-modal>

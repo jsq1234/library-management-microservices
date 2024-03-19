@@ -8,8 +8,10 @@ import com.amazonaws.services.cognitoidp.model.AdminGetUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthResult;
+import com.amazonaws.services.cognitoidp.model.AssociateSoftwareTokenRequest;
 import com.amazonaws.services.cognitoidp.model.AttributeType;
 import com.amazonaws.services.cognitoidp.model.AuthFlowType;
+import com.amazonaws.services.cognitoidp.model.ChallengeNameType;
 import com.amazonaws.services.cognitoidp.model.ConfirmForgotPasswordRequest;
 import com.amazonaws.services.cognitoidp.model.ConfirmForgotPasswordResult;
 import com.amazonaws.services.cognitoidp.model.ConfirmSignUpRequest;
@@ -20,8 +22,15 @@ import com.amazonaws.services.cognitoidp.model.GetUserRequest;
 import com.amazonaws.services.cognitoidp.model.GetUserResult;
 import com.amazonaws.services.cognitoidp.model.InitiateAuthRequest;
 import com.amazonaws.services.cognitoidp.model.InitiateAuthResult;
+import com.amazonaws.services.cognitoidp.model.RespondToAuthChallengeRequest;
+import com.amazonaws.services.cognitoidp.model.RespondToAuthChallengeResult;
+import com.amazonaws.services.cognitoidp.model.SetUserMFAPreferenceRequest;
+import com.amazonaws.services.cognitoidp.model.SetUserMFAPreferenceResult;
 import com.amazonaws.services.cognitoidp.model.SignUpRequest;
 import com.amazonaws.services.cognitoidp.model.SignUpResult;
+import com.amazonaws.services.cognitoidp.model.SoftwareTokenMfaSettingsType;
+import com.amazonaws.services.cognitoidp.model.VerifySoftwareTokenRequest;
+import com.amazonaws.services.cognitoidp.model.VerifySoftwareTokenResult;
 import com.demo.userservice.config.CognitoConfig;
 import com.demo.userservice.util.SecretHashUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +47,7 @@ public class UserService {
     private final CognitoConfig cognitoConfig;
 
     public SignUpResult registerUser(String email, String phoneNumber, String password) {
-       String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        email);
+       String secretHash = calculateSecretHash(email);
 
         log.info("Creating new user: {}", email);
 
@@ -73,10 +79,7 @@ public class UserService {
     }
 
     public ConfirmSignUpResult confirmVerificationCode(String userId, String code) {
-        String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        userId);
+        String secretHash = calculateSecretHash(userId);
 
         log.info("Confirming user[{}]", userId);
 
@@ -101,10 +104,7 @@ public class UserService {
     }
 
     public InitiateAuthResult signInUser(String email, String password) {
-        String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        email);
+        String secretHash = calculateSecretHash(email);
         
         Map<String,String> authParams = Map.ofEntries(
             Map.entry("USERNAME", email),
@@ -121,10 +121,63 @@ public class UserService {
         
         
         InitiateAuthResult result = cognitoIdentityProvider.initiateAuth(authRequest);
-
+                                                    
         log.info("User signed in: {}", result);
 
         return result;
+    }
+
+    public VerifySoftwareTokenResult verifySoftwareToken(String accessToken, String totpCode){
+        var verifySoftwareTokenRequest = new VerifySoftwareTokenRequest()
+                                                .withAccessToken(accessToken)
+                                                .withUserCode(totpCode)
+                                                .withFriendlyDeviceName("totpCode");
+        var result = cognitoIdentityProvider.verifySoftwareToken(verifySoftwareTokenRequest);
+        
+        log.info("Totp code verified: {}", result);
+
+        return result;
+    }
+
+    public SetUserMFAPreferenceResult setTotpMfaPreference(String accessToken){
+        SetUserMFAPreferenceRequest setUserMFAPreferenceRequest = new SetUserMFAPreferenceRequest()
+                                                    .withAccessToken(accessToken)
+                                                    .withSoftwareTokenMfaSettings(
+                                                        new SoftwareTokenMfaSettingsType()
+                                                                .withEnabled(true)
+                                                                .withPreferredMfa(true)     
+                                                    );
+
+        SetUserMFAPreferenceResult result = cognitoIdentityProvider.setUserMFAPreference(setUserMFAPreferenceRequest);
+        
+        log.info("User will be prompted for TOTP authentication from now on");
+
+        return result;
+    }
+
+    public RespondToAuthChallengeResult respondtoTotpMfaChallenge(String session, String email, String code){
+        String secretHash = calculateSecretHash(email);
+
+        var authChallengeRequest = new RespondToAuthChallengeRequest()
+                                            .withClientId(cognitoConfig.getClientId())
+                                            .withSession(session)
+                                            .withChallengeName(ChallengeNameType.SOFTWARE_TOKEN_MFA)
+                                            .withChallengeResponses(Map.ofEntries(
+                                                Map.entry("USERNAME", email),
+                                                Map.entry("SOFTWARE_TOKEN_MFA_CODE", code),
+                                                Map.entry("SECRET_HASH", secretHash)
+                                            ));
+        var authChallengeResult = cognitoIdentityProvider.respondToAuthChallenge(authChallengeRequest);
+
+        log.info("Mfa challenge result: {}", authChallengeResult);
+
+        return authChallengeResult; 
+    }
+
+    public String getSecretCodeForTotpMfa(String accessToken){
+        var associateSoftwareTokenRequest = new AssociateSoftwareTokenRequest()
+                                                    .withAccessToken(accessToken);
+        return cognitoIdentityProvider.associateSoftwareToken(associateSoftwareTokenRequest).getSecretCode();
     }
 
     public GetUserResult fetchUserInfo(String accessToken){
@@ -157,10 +210,8 @@ public class UserService {
     }
 
     public ForgotPasswordResult forgotPassword(String email){
-        String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        email);
+        String secretHash = calculateSecretHash(email);
+
         log.info("Sending password change request to {}", email);
                             
         ForgotPasswordRequest request = new ForgotPasswordRequest()
@@ -177,10 +228,7 @@ public class UserService {
     }
 
     public ConfirmForgotPasswordResult confirmForgotPassword(String email, String password, String code){
-        String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        email);
+        String secretHash = calculateSecretHash(email);
 
         ConfirmForgotPasswordRequest request = new ConfirmForgotPasswordRequest()
                                                         .withClientId(cognitoConfig.getClientId())
@@ -195,11 +243,9 @@ public class UserService {
 
         return result;
     }
+
     public AdminInitiateAuthResult renewTokens(String refreshToken, String userId) {
-        String secretHash = SecretHashUtil.calculateSecretHash(
-                                        cognitoConfig.getClientId(), 
-                                        cognitoConfig.getClientSecret(),
-                                        userId);
+        String secretHash = calculateSecretHash(userId);
 
         AdminInitiateAuthRequest authRequest = new AdminInitiateAuthRequest()
                                                     .withAuthFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
@@ -219,5 +265,13 @@ public class UserService {
         log.info("{}", authResult);
         
         return authResult;
+    }
+
+    private String calculateSecretHash(String username) {
+        return SecretHashUtil.calculateSecretHash(
+                cognitoConfig.getClientId(),
+                cognitoConfig.getClientSecret(),
+                username
+            );
     }
 }

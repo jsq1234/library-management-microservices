@@ -21,13 +21,22 @@ public class GatewayConfig {
                         r -> r.path("/auth/signup")
                                 .uri("http://user-service:8081/"))
                 .route("user-confirm-route",
-                        r -> r.path("/auth/confirm")
+                        r -> r.path("/auth/confirm_account")
                                 .uri("http://user-service:8081/"))
                 .route("user-change-password-request",
                         r -> r.path("/auth/forgot_password_request")
                                 .uri("http://user-service:8081/"))
                 .route("user-confirm-password-request",
-                         r -> r.path("/auth/confirm_forgot_password")
+                        r -> r.path("/auth/confirm_forgot_password")
+                                .uri("http://user-service:8081/"))
+                .route("user-mfa-preferences-route",
+                        r -> r.path("/auth/mfaPreferences/**")
+                                .uri("http://user-service:8081/"))
+                .route("user-verify-software-token",
+                        r -> r.path("/auth/verify_software_token")
+                                .uri("http://user-service:8081/"))
+                .route("user-verify-totp_code",
+                        r -> r.path("/auth/verify_totp_code")
                                 .uri("http://user-service:8081/"))
                 .route("generic-user-routes",
                         r -> r.path("/user/**")

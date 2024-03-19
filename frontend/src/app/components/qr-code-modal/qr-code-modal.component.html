@@ -1,0 +1,24 @@
+<div class="qr-modal" *ngIf="showModal">
+    <h4>
+        Scan the QR Code using Google Authenticator <br>
+        and enter the TOTP below.
+    </h4>
+    <div>
+        <qrcode class="qrcode" [imageWidth]="500" [imageHeight]="500" [width]="400" [qrdata]="qrCodeUrl"></qrcode>
+    </div>
+    <form [formGroup]="codeSubmition" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+            <input 
+            type="text" 
+            name="code" 
+            formControlName="code"
+            required />
+            <button class="submit-button" type="submit">
+                Send
+            </button>
+        </div>
+        <!-- <small *ngIf="isInvalidCode" class="s-error">
+            <div *ngIf="isInvalidCode">Invalid code</div>
+        </small> -->
+    </form>
+</div>

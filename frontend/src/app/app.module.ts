@@ -17,6 +17,9 @@ import { IssuesComponent } from './components/home/issues/issues.component';
 import { ConfirmationCodeComponent } from './components/confirmation-code/confirmation-code.component';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { QrCodeModalComponent } from './components/qr-code-modal/qr-code-modal.component';
+import { QRCodeModule } from 'angularx-qrcode';
+import { TotpCodeVerificationComponent } from './components/totp-code-verification/totp-code-verification.component';
 
 @NgModule({
   declarations: [
@@ -32,12 +35,15 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
     IssuesComponent,
     ConfirmationCodeComponent,
     ForgotPasswordComponent,
+    QrCodeModalComponent,
+    TotpCodeVerificationComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
+    QRCodeModule,
   ],
   providers: [
     {

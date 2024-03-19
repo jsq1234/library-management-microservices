@@ -18,9 +18,12 @@ import com.amazonaws.services.cognitoidp.model.SignUpResult;
 import com.demo.userservice.dto.ChangePassword;
 import com.demo.userservice.dto.ConfirmEmailRequest;
 import com.demo.userservice.dto.ForgotPasswordRequest;
+import com.demo.userservice.dto.InitiateAuthResponse;
 import com.demo.userservice.dto.SignInRequest;
 import com.demo.userservice.dto.SignInResponse;
 import com.demo.userservice.dto.SignUpRequest;
+import com.demo.userservice.dto.SoftwareTokenVerificationRequest;
+import com.demo.userservice.dto.TotpCodeRequest;
 import com.demo.userservice.services.UserService;
 import jakarta.validation.Valid;
 
@@ -64,9 +67,57 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<SignInResponse> loginUser(@Valid @RequestBody SignInRequest signInRequest){
+    public ResponseEntity<?> loginUser(@Valid @RequestBody SignInRequest signInRequest){
         InitiateAuthResult result = userService
                                         .signInUser(signInRequest.email(), signInRequest.password());
+        
+        // first time signing in
+        if(result.getChallengeName() == null){
+            String accessToken = result.getAuthenticationResult().getAccessToken();
+            String secretCode = userService.getSecretCodeForTotpMfa(accessToken);
+            /*
+             * Response object contains accessToken and secretCode, which will be used later
+             * to enable mfa for this current user. secretCode is to be used as a QR 
+             * and should be scanned by a authenticator like Google Authenticator.
+             * Here, I am creating the url which will be used to generate QR code on the
+             * frontedn 
+             */
+            String secretCodeUrl = String.format("otpauth://totp/%s?secret=%s&issuer=%s",
+                                                    signInRequest.email(),
+                                                    secretCode,
+                                                    "library-management-app");
+
+            InitiateAuthResponse authResponse = InitiateAuthResponse
+                                                    .builder()
+                                                    .mfaTokens(new InitiateAuthResponse
+                                                                    .MfaTokens(accessToken, secretCodeUrl))
+                                                    .build();
+            return ResponseEntity.ok(authResponse);
+        }
+
+        /* If it's not the first sign it, the api will return SOFTWARE_TOKEN_MFA challenge
+         * and will give a session string will is to be used for making further calls so that
+         * the challenge is completed (the totp code is verified), after which the AuthenticationResults
+         * will be populated and will return tokens
+         */
+        InitiateAuthResponse authResponse = InitiateAuthResponse
+                                                    .builder()
+                                                    .challengeName(result.getChallengeName())
+                                                    .session(result.getSession())
+                                                    .build();
+        return ResponseEntity.ok(authResponse);
+    }
+
+    @PostMapping("/verify_software_token")
+    public ResponseEntity<?> verifySoftwareToken(@RequestBody SoftwareTokenVerificationRequest softwareTokenVerificationRequest){
+        userService.verifySoftwareToken(softwareTokenVerificationRequest.accessToken(), softwareTokenVerificationRequest.code());
+        userService.setTotpMfaPreference(softwareTokenVerificationRequest.accessToken());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/verify_totp_code")
+    public ResponseEntity<SignInResponse> verifyTotpToken(@Valid @RequestBody TotpCodeRequest totpCodeRequest){
+        var result = userService.respondtoTotpMfaChallenge(totpCodeRequest.session(),totpCodeRequest.email(),totpCodeRequest.code());
         
         GetUserResult userResult = userService.fetchUserInfo(result.getAuthenticationResult().getAccessToken());
         

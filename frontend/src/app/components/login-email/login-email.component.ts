@@ -15,12 +15,27 @@ export class LoginEmailComponent {
     password: ['', [Validators.required]],
   });
 
+  codeConfirmationForm = this.formBuilder.group({
+    code: ['', [Validators.required]],
+  });
+
   private isBadCredentials = false;
+  public isModalVisible = false;
+  public accessToken = '';
+  public qrCodeUrl = '';
+  public showTotpCodeConfirmationForm = false;
+
   constructor(
     private formBuilder: FormBuilder,
     private router: Router,
     private authService: AuthService
   ) {}
+
+  openModal(mfaTokens: any) {
+    this.qrCodeUrl = mfaTokens.secretCodeUrl;
+    this.accessToken = mfaTokens.accessToken;
+    this.isModalVisible = true;
+  }
 
   get email() {
     return this.loginForm.controls['email'];
@@ -44,32 +59,21 @@ export class LoginEmailComponent {
       .subscribe({
         next: (value) => {
           this.isBadCredentials = false;
+          console.log(value);
+          // user is signing in for the first time
+          if (!value.challengeName) {
+            this.openModal(value.mfaTokens);
+          }
 
-          const { accessToken, idToken, refreshToken } =
-            value.authenticationResults;
-          const { userId, email, phoneNumber, role } = value;
-          this.authService.authToken = {
-            accessToken,
-            idToken,
-            refreshToken,
-          };
-
-          this.authService.user = {
-            userId,
-            email,
-            phoneNumber,
-            role,
-            name: 'random',
-          };
-
-          localStorage.setItem('user', JSON.stringify(this.authService.user));
-
-          localStorage.setItem(
-            'auth_tokens',
-            JSON.stringify(this.authService.authToken)
-          );
-
-          this.router.navigate(['/home']);
+          // user has signed up and setted mfa authentication
+          if (value.challengeName === 'SOFTWARE_TOKEN_MFA') {
+            this.router.navigate(['/verify_totp_code'], {
+              queryParams: {
+                session: value.session,
+                email: email as string,
+              },
+            });
+          }
         },
         error: (err) => {
           if (err instanceof HttpErrorResponse) {

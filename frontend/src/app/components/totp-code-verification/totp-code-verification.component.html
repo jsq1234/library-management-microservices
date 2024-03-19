@@ -1,0 +1,18 @@
+<div class="form-container">
+    <form [formGroup]="codeSubmition" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+            <label for="email">Please enter the TOTP using your authenticator</label>
+            <input 
+            type="text" 
+            name="code" 
+            formControlName="code"
+            required />
+        </div>
+        <small *ngIf="isInvalidCode" class="s-error">
+            <div *ngIf="isInvalidCode">Invalid code</div>
+        </small>
+        <button class="submit-button" type="submit">
+            Submit
+        </button>
+    </form>
+</div>

@@ -11,6 +11,8 @@ import { User } from '../interfaces/user';
 import { AuthToken } from '../interfaces/auth-token';
 import { SignUpResponse } from '../interfaces/signup-response';
 import { ChangePassword } from '../interfaces/change-password';
+import { InitiateAuthResponse } from '../interfaces/initiate-auth-response';
+import { TotpCodeVerificationRequest } from '../interfaces/totp-code-verification-request';
 
 @Injectable({
   providedIn: 'root',
@@ -22,8 +24,10 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  public loginByEmail(requestBody: EmailLoginReq): Observable<SignInResponse> {
-    return this.http.post<SignInResponse>(
+  public loginByEmail(
+    requestBody: EmailLoginReq
+  ): Observable<InitiateAuthResponse> {
+    return this.http.post<InitiateAuthResponse>(
       `${this.baseUrl}/signin`,
       requestBody
     );
@@ -68,6 +72,25 @@ export class AuthService {
     localStorage.removeItem('user');
     localStorage.removeItem('auth_tokens');
     this.router.navigate(['login']);
+  }
+
+  public verifySoftwareToken(requestBody: {
+    code: string;
+    accessToken: string;
+  }): Observable<void> {
+    return this.http.post<void>(
+      `${this.baseUrl}/verify_software_token`,
+      requestBody
+    );
+  }
+
+  public verifyTotpCode(
+    requestBody: TotpCodeVerificationRequest
+  ): Observable<SignInResponse> {
+    return this.http.post<SignInResponse>(
+      `${this.baseUrl}/verify_totp_code`,
+      requestBody
+    );
   }
 
   get user(): User | null {
