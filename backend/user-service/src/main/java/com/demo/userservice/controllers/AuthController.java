@@ -46,7 +46,7 @@ public class AuthController {
     public ResponseEntity<ConfirmSignUpResult> confirmUser(@Valid @RequestBody ConfirmEmailRequest confirmRequest){
         ConfirmSignUpResult result = userService
                                         .confirmVerificationCode(confirmRequest.userId(), confirmRequest.code());
-                                        
+        userService.addUserToUserGroup(confirmRequest.userId());                                
         return ResponseEntity.status(200).body(result);
     }
 
@@ -132,7 +132,7 @@ public class AuthController {
                                             .role(map.get("custom:groups"))
                                             .userId(map.get("sub"))
                                             .build();   
-                                                                 
+                                           
         return ResponseEntity.ok(loginResponse);
     }
 

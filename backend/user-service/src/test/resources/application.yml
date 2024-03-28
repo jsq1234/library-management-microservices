@@ -1,0 +1,13 @@
+cognito:
+  pool_id: ${PoolId}
+  client_id: ${ClientId}
+  client_secret: ${ClientSecret}
+  region: ${Region}
+
+aws:
+  access_key: ${AccessKey}
+  secret_access_key: ${SecretAccessKey}
+
+logging:
+  pattern:
+    console: "User-Service: %5p | %-40.40logger{39} : %m%n"

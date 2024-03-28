@@ -4,6 +4,10 @@ import org.springframework.stereotype.Service;
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupRequest;
 import com.amazonaws.services.cognitoidp.model.AdminAddUserToGroupResult;
+import com.amazonaws.services.cognitoidp.model.AdminConfirmSignUpRequest;
+import com.amazonaws.services.cognitoidp.model.AdminConfirmSignUpResult;
+import com.amazonaws.services.cognitoidp.model.AdminDeleteUserRequest;
+import com.amazonaws.services.cognitoidp.model.AdminDeleteUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminGetUserRequest;
 import com.amazonaws.services.cognitoidp.model.AdminGetUserResult;
 import com.amazonaws.services.cognitoidp.model.AdminInitiateAuthRequest;
@@ -93,12 +97,6 @@ public class UserService {
         ConfirmSignUpResult confirmationResult = cognitoIdentityProvider.confirmSignUp(request);
 
         log.info("User[{}] successfully confirmed: {}", userId, confirmationResult);
-
-        log.info("Adding user to User group");
-
-        var result = addUserToUserGroup(userId);
-
-        log.info("Added user to User group: {}", result);
 
         return confirmationResult;
     }
@@ -199,12 +197,18 @@ public class UserService {
     }
 
 
-    public AdminAddUserToGroupResult addUserToUserGroup(String email){
+    public AdminAddUserToGroupResult addUserToUserGroup(String userId){
+        
         AdminAddUserToGroupRequest request = new AdminAddUserToGroupRequest()
-                                                .withGroupName("user")
-                                                .withUserPoolId(cognitoConfig.getPoolId())
-                                                .withUsername(email);
+                                                    .withGroupName("user")
+                                                    .withUserPoolId(cognitoConfig.getPoolId())
+                                                    .withUsername(userId);
+        
+        log.info("Adding user to User group");
+
         AdminAddUserToGroupResult result = cognitoIdentityProvider.adminAddUserToGroup(request);
+
+        log.info("Added user to User group: {}", result);
 
         return result;
     }
@@ -265,6 +269,37 @@ public class UserService {
         log.info("{}", authResult);
         
         return authResult;
+    }
+
+    public AdminConfirmSignUpResult adminConfirmUserSignUp(String userId){
+        AdminConfirmSignUpResult result = cognitoIdentityProvider.adminConfirmSignUp(
+            new AdminConfirmSignUpRequest()
+                .withUserPoolId(cognitoConfig.getPoolId())
+                .withUsername(userId)
+        );
+
+        if(result.getSdkHttpMetadata().getHttpStatusCode() == 200){
+            log.info("User[{}] confirmed", userId);
+        }else{
+            log.info("User couldn't be confirmed.");
+        }
+
+        return result;
+    }
+
+    public AdminDeleteUserResult adminDeleteUserResult(String userId){
+        AdminDeleteUserResult result = cognitoIdentityProvider.adminDeleteUser(
+            new AdminDeleteUserRequest()
+                .withUserPoolId(cognitoConfig.getPoolId())
+                .withUsername(userId)
+        );
+
+        if(result.getSdkHttpMetadata().getHttpStatusCode() == 200){
+            log.info("User[{}] deleted.", userId);
+        }else{
+            log.info("User couldn't be deleted.");
+        }
+        return result;
     }
 
     private String calculateSecretHash(String username) {
